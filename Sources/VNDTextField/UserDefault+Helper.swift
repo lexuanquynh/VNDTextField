@@ -7,11 +7,11 @@
 
 import Foundation
 
-public enum Defaults: String {
+enum Defaults: String {
     case suggestions
 }
 
-public final class UserDefaultHelper {
+final class UserDefaultHelper {
     // Access shared defaults object
     static let userDefaults = UserDefaults.standard
     

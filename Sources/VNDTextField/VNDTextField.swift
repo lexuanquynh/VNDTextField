@@ -35,16 +35,16 @@ public enum TitleButton {
     }
 }
 
-// MARK: - UITextField
-public class TextField: UITextField {
+// MARK: - VNDTextField
+public class VNDTextField: UITextField {
     
-    public let viewSuggest: UIView = {
+    private let viewSuggest: UIView = {
         let accessoryView = UIView(frame: .zero)
         accessoryView.backgroundColor = .white
         return accessoryView
     }()
     
-    public let stackView: UIStackView = {
+    private let stackView: UIStackView = {
         let stackView = UIStackView()
         stackView.spacing = 5
         stackView.axis = .horizontal
@@ -52,28 +52,28 @@ public class TextField: UITextField {
         return stackView
     }()
     
-    public let button1: UIButton = {
+    private let button1: UIButton = {
         let title: TitleButton = .buttonOne
         let button = UIButton()
-        button.backgroundColor = .gray
+        button.backgroundColor = Constant.background
         button.setTitle(title.setTitileButton, for: .normal)
         button.layer.cornerRadius = Constant.BUTTON_CORNER_RADIUS
         return button
     }()
     
-    public let button2: UIButton = {
+    private let button2: UIButton = {
         let title: TitleButton = .buttonTwo
         let button = UIButton()
-        button.backgroundColor = .gray
+        button.backgroundColor = Constant.background
         button.setTitle(title.setTitileButton, for: .normal)
         button.layer.cornerRadius = Constant.BUTTON_CORNER_RADIUS
         return button
     }()
     
-    public let button3: UIButton = {
+    private let button3: UIButton = {
         let title: TitleButton = .buttonThree
         let button = UIButton()
-        button.backgroundColor = .gray
+        button.backgroundColor = Constant.background
         button.setTitle(title.setTitileButton, for: .normal)
         button.layer.cornerRadius = Constant.BUTTON_CORNER_RADIUS
         return button
@@ -86,7 +86,7 @@ public class TextField: UITextField {
         addViewSuggest()
         saveListSuggest()
     }
-
+    
     required public init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
         makeUI()
@@ -95,12 +95,39 @@ public class TextField: UITextField {
         saveListSuggest()
     }
     
+    /// Set background for buttons
+    /// - Parameter backgroudColor: backgroudColor for button
+    public func setButtonBackGroundColor(backgroudColor: UIColor) {
+        Constant.background = backgroudColor
+        self.buttonNeedDisplay()
+    }
+    
+    /// Set corner Radius for buttons
+    /// - Parameter cornerRadius: cornerRadius for buttons
+    public func setButtonCornerRadius(cornerRadius: CGFloat) {
+        Constant.BUTTON_CORNER_RADIUS = cornerRadius
+        self.buttonNeedDisplay()
+    }
+    
+    /// Set symboy
+    /// - Parameter symbol: symbol eg vnd or VND
+    public func setSymbol(symbol: String) {
+        Constant.SYMBOL = symbol
+        self.buttonNeedDisplay()
+    }
+    
+    private func buttonNeedDisplay() {
+        self.button1.setNeedsDisplay()
+        self.button2.setNeedsDisplay()
+        self.button3.setNeedsDisplay()
+    }
+    
     /// Init Data
-    public func saveListSuggest() {
+    private func saveListSuggest() {
         UserDefaultHelper.suggestions = ["100.000", "300.000", "500.000"]
     }
     
-    public func makeUI() {
+    private func makeUI() {
         translatesAutoresizingMaskIntoConstraints = false
         keyboardType = .numberPad
         textAlignment = .left
@@ -112,7 +139,7 @@ public class TextField: UITextField {
         placeholder = "0đ"
     }
     
-    public func addViewSuggest() {
+    private func addViewSuggest() {
         viewSuggest.frame = CGRect(x: 0, y: 0, width: UIScreen.main.bounds.width, height: 40)
         viewSuggest.translatesAutoresizingMaskIntoConstraints = false
         button1.translatesAutoresizingMaskIntoConstraints = false
@@ -124,7 +151,7 @@ public class TextField: UITextField {
         stackView.addArrangedSubview(button3)
         viewSuggest.addSubview(stackView)
         let padding: CGFloat = 5
-               
+        
         // contrain
         NSLayoutConstraint.activate([
             stackView.topAnchor.constraint(equalTo: viewSuggest.topAnchor, constant: padding),
@@ -136,14 +163,14 @@ public class TextField: UITextField {
         inputAccessoryView = viewSuggest
     }
     
-    public func commonInit() {
+    private func commonInit() {
         self.addTarget(self, action: #selector(textDidChange), for: .editingChanged)
         button1.addTarget(self, action: #selector(buttonAction(_:)), for: .touchUpInside)
         button2.addTarget(self, action: #selector(buttonAction(_:)), for: .touchUpInside)
         button3.addTarget(self, action: #selector(buttonAction(_:)), for: .touchUpInside)
     }
     
-    @objc public func textDidChange() {
+    @objc private func textDidChange() {
         guard var inputText = self.text else {
             return
         }
@@ -157,7 +184,7 @@ public class TextField: UITextField {
         
         // remove space from text in textfield
         inputText.removeAll { $0 == " " }
-
+        
         // format currency text in textfield
         if let amountString = Int(inputText) {
             self.text = formatCurrency(amountString)
@@ -182,7 +209,7 @@ public class TextField: UITextField {
         }
     }
     
-    @objc public func buttonAction(_ button: UIButton) {
+    @objc private func buttonAction(_ button: UIButton) {
         switch button {
         case button1:
             guard var inputText = button1.currentTitle else {
@@ -208,7 +235,7 @@ public class TextField: UITextField {
             }
             
             inputText.removeAll { $0 == "." }
-
+            
             if let text = Int(inputText) {
                 return self.text = formatCurrency(text)
             }
@@ -221,7 +248,7 @@ public class TextField: UITextField {
     /// - Parameter inputNumber: ext in textfield as Int
     /// - Parameter symbol: defaufl character  = "đ"
     /// - Returns: type currency
-    public func formatCurrency(_ inputNumber: Int) -> String {
+    private func formatCurrency(_ inputNumber: Int) -> String {
         let formatter = NumberFormatter()
         formatter.currencySymbol = Constant.SYMBOL
         formatter.currencyGroupingSeparator = "."
@@ -234,7 +261,7 @@ public class TextField: UITextField {
     /// Format number
     /// - Parameter amount: text in textfied as Int
     /// - Returns: type decimal
-    public func df2so(_ amount: Int) -> String {
+    private func df2so(_ amount: Int) -> String {
         let numberFormatter = NumberFormatter()
         numberFormatter.groupingSeparator = "."
         numberFormatter.groupingSize = 3
